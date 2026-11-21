@@ -151,7 +151,7 @@ main{padding:14px}
 
 <script type="module">
 /* ============ আপনার Firebase কনফিগ এখানে বসান (থিমের কনফিগের হুবহু একই) ============ */
-const CONFIG={apiKey:"AIzaSyCaP3tWo3rEQzMcqFMtubgau4CbeMBPBu4",authDomain:"al-khidmah-natural-care.firebaseapp.com",projectId:"al-khidmah-natural-care",storageBucket:"al-khidmah-natural-care.firebasestorage.app",messagingSenderId:"60835871884",appId:"1:60835871884:web:bfe3d868e3ecfa4ba98fa9",measurementId:"G-YBYQ37S6N9"};
+const CONFIG={apiKey:"AIzaSyA5zC9ZaYSIBRUXzpcO5zch0tx8OLMIQ6g",authDomain:"rakib-57140.firebaseapp.com",projectId:"rakib-57140",storageBucket:"rakib-57140.firebasestorage.app",messagingSenderId:"977267332313",appId:"1:977267332313:web:25e3839830062017df1ac8"};
 /* ================================================================================== */
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -365,12 +365,12 @@ async function setStatus(o,ns){
  if(ns==='confirmed'&&!o.publicLogged){b.set(doc(collection(db,'publicOrders')),{name:String(o.name||'').trim().split(/\s+/)[0]||'কাস্টমার',product:o.items[0]?.name||'',more:o.items.length-1,at:serverTimestamp(),orderId:o.id});upd.publicLogged=true}
  if(ns==='delivered'&&!o.rewarded){
   const earn=Math.floor((o.subtotal||0)/(+st.pointsPerSpend||2000))*(+st.pointsEarn||100);
-  b.update(doc(db,'users',o.uid),{points:increment(earn),totalSpent:increment(o.subtotal||0)});
-  upd.rewarded=true;upd.pointsEarned=earn;
-  const u=D.users.find(x=>x.id===o.uid);
+  if(!o.guest)b.update(doc(db,'users',o.uid),{points:increment(earn),totalSpent:increment(o.subtotal||0)});
+  upd.rewarded=true;upd.pointsEarned=o.guest?0:earn;
+  const u=o.guest?null:D.users.find(x=>x.id===o.uid);
   if(u&&u.referredBy&&u.referredBy!==o.uid){const c=commFor(o);if(c>0){b.update(doc(db,'users',u.referredBy),{wallet:increment(c)});b.set(doc(collection(db,'commissions')),{to:u.referredBy,from:o.uid,orderId:o.id,amount:c,at:serverTimestamp()});upd.commission=c}}
  }
- if(ns==='cancelled'&&!o.refunded&&o.pointsUsed>0){b.update(doc(db,'users',o.uid),{points:increment(o.pointsUsed)});upd.refunded=true}
+ if(ns==='cancelled'&&!o.refunded&&!o.guest&&o.pointsUsed>0){b.update(doc(db,'users',o.uid),{points:increment(o.pointsUsed)});upd.refunded=true}
  b.update(doc(db,'orders',o.id),upd);
  try{await b.commit();toast('✅ স্ট্যাটাস: '+L[ns]);const us=await getDocs(collection(db,'users'));D.users=us.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.error(e);toast('❌ '+(e.code||e.message))}
 }
@@ -379,7 +379,7 @@ function vOrd(){
  $('#act').innerHTML=`<select class="btn" id="of"><option value="">সব অর্ডার</option>${Object.entries(L).map(([k,v])=>`<option value="${k}" ${ofl===k?'selected':''}>${v}</option>`).join('')}</select>`;
  $('#of').onchange=e=>{ofl=e.target.value;vOrd()};
  const l=D.orders.filter(o=>!ofl||o.status===ofl);
- $('#content').innerHTML=l.map(o=>`<div class="oc"><div class="h"><div><b>#${o.id.slice(0,6).toUpperCase()}</b> · ${esc(o.name)} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br><small style="color:var(--mu)">${esc(o.address)}${o.note?' · নোট: '+esc(o.note):''}</small></div><div style="text-align:right"><span class="pill ${o.status}">${L[o.status]}</span><br><small style="color:var(--mu)">${fdate(o.createdAt)}</small></div></div>${o.items.map(i=>{const p=D.products.find(x=>x.id===i.id);const bad=p&&fp(p)!==i.price;return `<div class="oi"><img src="${esc(i.image||'')}" onerror="this.style.visibility='hidden'"><span style="flex:1">${esc(i.name)} × ${bn(i.qty)}${bad?` <span class="bn">⚠️ বর্তমান দাম ${tk(fp(p))}, অর্ডারে ${tk(i.price)}</span>`:''}</span><b>${tk(i.price*i.qty)}</b></div>`}).join('')}<div style="margin-top:6px;font-size:14px;color:var(--mu)">সাবটোটাল ${tk(o.subtotal)} · ডেলিভারি ${o.delivery?tk(o.delivery):'ফ্রি'}${o.pointsUsed?` · পয়েন্ট ছাড় −${tk(o.pointsDiscount)} (${bn(o.pointsUsed)} পয়েন্ট)`:''} · <b style="color:var(--tx)">মোট ${tk(o.total)}</b> · ${esc(o.payment||'COD')}${o.rewarded?` · ✅ পয়েন্ট +${bn(o.pointsEarned||0)}${o.commission?' · কমিশন '+tk(o.commission):''}`:''}</div><div class="sb">${Object.entries(L).map(([k,v])=>`<button class="${o.status===k?'on':''}" data-s="${o.id}|${k}">${v}</button>`).join('')}</div></div>`).join('')||'<div class="card">কোনো অর্ডার নেই</div>';
+ $('#content').innerHTML=l.map(o=>`<div class="oc"><div class="h"><div><b>#${o.id.slice(0,6).toUpperCase()}</b> · ${esc(o.name)}${o.guest?' <span class="bn">অতিথি</span>':''} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br><small style="color:var(--mu)">${esc(o.address)}${o.note?' · নোট: '+esc(o.note):''}</small></div><div style="text-align:right"><span class="pill ${o.status}">${L[o.status]}</span><br><small style="color:var(--mu)">${fdate(o.createdAt)}</small></div></div>${o.items.map(i=>{const p=D.products.find(x=>x.id===i.id);const bad=p&&fp(p)!==i.price;return `<div class="oi"><img src="${esc(i.image||'')}" onerror="this.style.visibility='hidden'"><span style="flex:1">${esc(i.name)} × ${bn(i.qty)}${bad?` <span class="bn">⚠️ বর্তমান দাম ${tk(fp(p))}, অর্ডারে ${tk(i.price)}</span>`:''}</span><b>${tk(i.price*i.qty)}</b></div>`}).join('')}<div style="margin-top:6px;font-size:14px;color:var(--mu)">সাবটোটাল ${tk(o.subtotal)} · ডেলিভারি ${o.delivery?tk(o.delivery):'ফ্রি'}${o.pointsUsed?` · পয়েন্ট ছাড় −${tk(o.pointsDiscount)} (${bn(o.pointsUsed)} পয়েন্ট)`:''} · <b style="color:var(--tx)">মোট ${tk(o.total)}</b> · ${esc(o.payment||'COD')}${o.rewarded?` · ✅ পয়েন্ট +${bn(o.pointsEarned||0)}${o.commission?' · কমিশন '+tk(o.commission):''}`:''}</div><div class="sb">${Object.entries(L).map(([k,v])=>`<button class="${o.status===k?'on':''}" data-s="${o.id}|${k}">${v}</button>`).join('')}</div></div>`).join('')||'<div class="card">কোনো অর্ডার নেই</div>';
  $$('[data-s]').forEach(b=>b.onclick=()=>{const [id,s]=b.dataset.s.split('|');setStatus(D.orders.find(o=>o.id===id),s)});
 }
 
