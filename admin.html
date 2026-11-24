@@ -161,7 +161,9 @@ const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 const tk=n=>'৳'+bn(Math.round(+n||0).toLocaleString('en-US'));
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400)};
-const DEF={siteName:'আমার শপ',tagline:'সেরা পণ্য, সেরা দামে, দ্রুত ডেলিভারি।',announceText:'🎁 নতুন কাস্টমারদের জন্য ১০ পয়েন্ট ফ্রি · ৳৩,০০০+ কেনাকাটায় ডেলিভারি ফ্রি',announceLink:'#/signup',freeDeliveryMin:3000,deliveryFee:80,pointsPerSpend:2000,pointsEarn:100,pointValue:1,whatsapp:'',phone:'',address:'',logo:'',favicon:'',facebook:'',youtube:'',instagram:'',tiktok:'',payMethods:'cod',showTrust:true,trustItems:'🌿|১০০% খাঁটি|সরাসরি উৎস থেকে সংগ্রহ\n💵|ক্যাশ অন ডেলিভারি|পণ্য হাতে পেয়ে টাকা দিন\n↩️|৭ দিনে ফেরত|সমস্যা হলে সহজ ফেরত\n🚚|দ্রুত ডেলিভারি|সারা দেশে দ্রুত পৌঁছে দিই',flashTitle:'⚡ ফ্ল্যাশ সেল',flashEndsAt:0,categories:[{id:'organic',name:'অর্গানিক',icon:'🌿'},{id:'electronics',name:'ইলেক্ট্রনিক',icon:'🔌'}]};
+/* ভিডিও আপলোডের জন্য Cloudinary (ফাঁকা থাকলে আপলোড বাটন দেখাবে না, শুধু লিংক বসানো যাবে) */
+const CLD={cloud:'',preset:''};
+const DEF={siteName:'আমার শপ',tagline:'সেরা পণ্য, সেরা দামে, দ্রুত ডেলিভারি।',announceText:'🚚 ৳৩,০০০+ কেনাকাটায় ডেলিভারি ফ্রি · ক্যাশ অন ডেলিভারি',announceLink:'#/signup',freeDeliveryMin:3000,deliveryFee:80,deliveryDhaka:80,deliveryOutside:140,pointsPerSpend:2000,pointsEarn:100,pointValue:1,whatsapp:'',phone:'',address:'',logo:'',favicon:'',facebook:'',youtube:'',instagram:'',tiktok:'',payMethods:'cod',showTrust:true,trustItems:'🌿|১০০% খাঁটি|সরাসরি উৎস থেকে সংগ্রহ\n💵|ক্যাশ অন ডেলিভারি|পণ্য হাতে পেয়ে টাকা দিন\n↩️|৭ দিনে ফেরত|সমস্যা হলে সহজ ফেরত\n🚚|দ্রুত ডেলিভারি|সারা দেশে দ্রুত পৌঁছে দিই',flashTitle:'⚡ ফ্ল্যাশ সেল',flashEndsAt:0,categories:[{id:'organic',name:'অর্গানিক',icon:'🌿'},{id:'electronics',name:'ইলেক্ট্রনিক',icon:'🔌'}]};
 const D={settings:{...DEF},products:[],banners:[],orders:[],users:[],chats:[]};
 let tab='dash',unsubs=[],chatUn=null,curChat=null;
 const TABS=[['dash','📊','ড্যাশবোর্ড'],['prod','📦','প্রডাক্ট'],['cat','🗂️','ক্যাটাগরি'],['hero','🖼️','হিরো ব্যানার'],['promo','🏷️','ডিসকাউন্ট ব্যানার'],['strip','📢','স্ট্রিপ ব্যানার'],['ord','🧾','অর্ডার'],['usr','👥','কাস্টমার'],['chat','💬','লাইভ চ্যাট'],['set','⚙️','সেটিংস']];
@@ -216,6 +218,7 @@ $('#mod').onclick=e=>{if(e.target.id==='mod')closeModal()};
 function fld(f,v){
  const val=v===undefined?(f.def===undefined?'':f.def):v,n=`name="${f.k}"`,w=f.w?' w':'';
  if(f.t==='ta')return `<label class="f${w}"><span>${f.l}</span><textarea ${n} rows="${f.rows||3}" placeholder="${esc(f.ph||'')}">${esc(f.t2?val.join('\n'):val)}</textarea></label>`;
+ if(f.t==='vid')return `<label class="f w"><span>${f.l}</span><input type="url" name="${f.k}" value="${esc(val)}" placeholder="https://www.youtube.com/shorts/... অথবা https://....mp4"></label>${CLD.cloud&&CLD.preset?'<div class="f w"><button type="button" class="btn" id="vup">📤 ভিডিও আপলোড করুন (সর্বোচ্চ ১০০ এমবি)</button> <input type="file" id="vf" accept="video/*" hidden> <small id="vst" style="color:var(--mu)"></small></div>':''}`;
  if(f.t==='imgs')return `<label class="f w"><span>${f.l}</span><textarea ${n} rows="4" placeholder="প্রতি লাইনে একটি ইমেজ লিংক (সর্বোচ্চ ৪টি)">${esc((val||[]).join('\n'))}</textarea></label>`;
  if(f.t==='sel')return `<label class="f${w}"><span>${f.l}</span><select ${n}>${f.o.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(val)?'selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
  if(f.t==='chk')return `<label class="f${w}"><span>${f.l}</span><input type="checkbox" ${n} ${val!==false&&val!==''&&val?'checked':''}></label>`;
@@ -231,6 +234,17 @@ function rd(root,fs){
 function editor(title,fs,item,onSave,pv){
  modal(`<h2>${title}</h2>${pv?'<div id="pv"></div>':''}<form id="ef"><div class="fg">${fs.map(f=>fld(f,item?item[f.k]:undefined)).join('')}</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px"><button type="button" class="btn" id="ec">বাতিল</button><button class="btn bp">💾 সেভ করুন</button></div></form>`);
  $('#ec').onclick=closeModal;
+ const vb=$('#vup');
+ if(vb){const fi=$('#vf'),st=$('#vst'),inp=$('[name=videoUrl]');
+  vb.onclick=()=>fi.click();
+  fi.onchange=()=>{const f=fi.files[0];if(!f)return;
+   if(f.size>100*1024*1024){st.textContent='❌ ভিডিও ১০০ এমবির বেশি';return}
+   const x=new XMLHttpRequest(),fd=new FormData();fd.append('file',f);fd.append('upload_preset',CLD.preset);
+   x.open('POST','https://api.cloudinary.com/v1_1/'+CLD.cloud+'/video/upload');
+   x.upload.onprogress=e=>{if(e.lengthComputable)st.textContent='আপলোড হচ্ছে… '+bn(Math.round(e.loaded/e.total*100))+'%'};
+   x.onload=()=>{try{const r=JSON.parse(x.responseText);if(r.secure_url){inp.value=r.secure_url;st.textContent='✅ আপলোড হয়েছে — এবার সেভ করুন'}else st.textContent='❌ '+((r.error&&r.error.message)||'আপলোড হয়নি')}catch(e){st.textContent='❌ আপলোড হয়নি'}};
+   x.onerror=()=>{st.textContent='❌ নেটওয়ার্ক সমস্যা'};
+   st.textContent='আপলোড শুরু হচ্ছে…';x.send(fd)}}
  if(pv){const u=()=>{$('#pv').innerHTML=pv(rd($('#ef'),fs))};$('#ef').addEventListener('input',u);$('#ef').addEventListener('change',u);u()}
  $('#ef').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('.bp');b.disabled=true;try{await onSave(rd(e.target,fs));closeModal();toast('✅ সেভ হয়েছে')}catch(x){console.error(x);toast('❌ সেভ হয়নি: '+(x.code||x.message));b.disabled=false}};
 }
@@ -246,7 +260,7 @@ function vDash(){
  const cnt=days.map(d=>D.orders.filter(o=>ms(o.createdAt)&&new Date(ms(o.createdAt)).toDateString()===d.toDateString()).length),mx=Math.max(1,...cnt);
  $('#content').innerHTML=`<div class="stats"><div class="st g1"><small>মোট বিক্রি (ডেলিভারড)</small><b>${tk(sales)}</b></div><div class="st g2"><small>আজকের অর্ডার</small><b>${bn(tod)}</b></div><div class="st g3"><small>অপেক্ষমাণ অর্ডার</small><b>${bn(pend)}</b></div><div class="st g4"><small>মোট কাস্টমার</small><b>${bn(D.users.length)}</b></div><div class="st g5"><small>প্রডাক্ট</small><b>${bn(D.products.length)}</b></div><div class="st g6"><small>কম স্টক (≤৫)</small><b>${bn(low)}</b></div></div>
  <div class="card"><h2>📈 গত ৭ দিনের অর্ডার</h2><div class="chart">${days.map((d,i)=>`<div><b>${bn(cnt[i])}</b><i style="height:${cnt[i]/mx*100}%"></i>${bn(d.getDate())}/${bn(d.getMonth()+1)}</div>`).join('')}</div></div>
- <div class="stats"><div class="card" style="margin:0"><small style="color:var(--mu)">কাস্টমারদের মোট পয়েন্ট দায়</small><h2 style="margin:6px 0 0">💎 ${bn(pts)} (${tk(pts*(+D.settings.pointValue||1))})</h2></div><div class="card" style="margin:0"><small style="color:var(--mu)">রেফার কমিশন ব্যালেন্স (পরিশোধযোগ্য)</small><h2 style="margin:6px 0 0">🤝 ${tk(comm)}</h2></div></div>
+ <div class="stats"><div class="card" style="margin:0"><small style="color:var(--mu)">রেফার কমিশন ব্যালেন্স (পরিশোধযোগ্য)</small><h2 style="margin:6px 0 0">🤝 ${tk(comm)}</h2></div></div>
  <div class="card"><h2>🕒 সাম্প্রতিক অর্ডার</h2><div class="tw"><table><tr><th>আইডি</th><th>নাম</th><th>মোট</th><th>স্ট্যাটাস</th><th>সময়</th></tr>${D.orders.slice(0,6).map(o=>`<tr><td>#${o.id.slice(0,6).toUpperCase()}</td><td>${esc(o.name)}${isGuest(o)?' <span class="pill guest">গেস্ট</span>':''}</td><td>${tk(o.total)}</td><td><span class="pill ${o.status}">${L[o.status]}</span></td><td>${fdate(o.createdAt)}</td></tr>`).join('')||'<tr><td colspan="5">কোনো অর্ডার নেই</td></tr>'}</table></div></div>`;
 }
 
@@ -261,6 +275,7 @@ const PF=()=>[
  {k:'commissionType',l:'রেফার কমিশন ধরন',t:'sel',o:[['none','কমিশন নেই'],['percent','শতাংশ (%)'],['fixed','ফিক্সড টাকা (৳)']]},
  {k:'commissionValue',l:'কমিশন পরিমাণ',t:'num',def:0},
  {k:'images',l:'ইমেজ লিংক (৩/৪টি)',t:'imgs'},
+ {k:'videoUrl',l:'ভিডিও লিংক (YouTube/Shorts অথবা MP4) — প্রডাক্ট পেজের প্রথম স্লটে নিজে চলবে। ফাঁকা রাখলে ভিডিও থাকবে না',t:'vid',w:1},
  {k:'desc',l:'বিবরণ',t:'ta',rows:5,w:1},
  {k:'featured',l:'ফিচার্ড',t:'chk',def:false},
  {k:'active',l:'সাইটে দেখান',t:'chk',def:true}
@@ -365,9 +380,8 @@ async function setStatus(o,ns){
  if(ns==='delivered'&&!o.rewarded){
   if(guest){upd.rewarded=true;upd.pointsEarned=0}
   else{
-   const earn=Math.floor((o.subtotal||0)/(+st.pointsPerSpend||2000))*(+st.pointsEarn||100);
-   b.update(doc(db,'users',o.uid),{points:increment(earn),totalSpent:increment(o.subtotal||0)});
-   upd.rewarded=true;upd.pointsEarned=earn;
+   b.update(doc(db,'users',o.uid),{totalSpent:increment(o.subtotal||0)});
+   upd.rewarded=true;upd.pointsEarned=0;
    const u=D.users.find(x=>x.id===o.uid);
    if(u&&u.referredBy&&u.referredBy!==o.uid){const c=commFor(o);if(c>0){b.update(doc(db,'users',u.referredBy),{wallet:increment(c)});b.set(doc(collection(db,'commissions')),{to:u.referredBy,from:o.uid,orderId:o.id,amount:c,at:serverTimestamp()});upd.commission=c}}
   }
@@ -381,7 +395,7 @@ function vOrd(){
  $('#act').innerHTML=`<select class="btn" id="of"><option value="">সব অর্ডার</option>${Object.entries(L).map(([k,v])=>`<option value="${k}" ${ofl===k?'selected':''}>${v}</option>`).join('')}</select>`;
  $('#of').onchange=e=>{ofl=e.target.value;vOrd()};
  const l=D.orders.filter(o=>!ofl||o.status===ofl);
- $('#content').innerHTML=l.map(o=>`<div class="oc"><div class="h"><div><b>#${o.id.slice(0,6).toUpperCase()}</b> · ${esc(o.name)}${isGuest(o)?' <span class="pill guest">গেস্ট</span>':''} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br><small style="color:var(--mu)">${esc(o.address)}${o.note?' · নোট: '+esc(o.note):''}</small></div><div style="text-align:right"><span class="pill ${o.status}">${L[o.status]}</span><br><small style="color:var(--mu)">${fdate(o.createdAt)}</small></div></div>${o.items.map(i=>{const p=D.products.find(x=>x.id===i.id);const bad=p&&fp(p)!==i.price;return `<div class="oi"><img src="${esc(i.image||'')}" onerror="this.style.visibility='hidden'"><span style="flex:1">${esc(i.name)} × ${bn(i.qty)}${bad?` <span class="bn">⚠️ বর্তমান দাম ${tk(fp(p))}, অর্ডারে ${tk(i.price)}</span>`:''}</span><b>${tk(i.price*i.qty)}</b></div>`}).join('')}<div style="margin-top:6px;font-size:14px;color:var(--mu)">সাবটোটাল ${tk(o.subtotal)} · ডেলিভারি ${o.delivery?tk(o.delivery):'ফ্রি'}${o.pointsUsed?` · পয়েন্ট ছাড় −${tk(o.pointsDiscount)} (${bn(o.pointsUsed)} পয়েন্ট)`:''} · <b style="color:var(--tx)">মোট ${tk(o.total)}</b> · ${esc(o.payment||'COD')}${o.rewarded&&!isGuest(o)?` · ✅ পয়েন্ট +${bn(o.pointsEarned||0)}${o.commission?' · কমিশন '+tk(o.commission):''}`:''}</div><div class="sb">${Object.entries(L).map(([k,v])=>`<button class="${o.status===k?'on':''}" data-s="${o.id}|${k}">${v}</button>`).join('')}</div></div>`).join('')||'<div class="card">কোনো অর্ডার নেই</div>';
+ $('#content').innerHTML=l.map(o=>`<div class="oc"><div class="h"><div><b>#${o.id.slice(0,6).toUpperCase()}</b> · ${esc(o.name)}${isGuest(o)?' <span class="pill guest">গেস্ট</span>':''} · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a><br><small style="color:var(--mu)">${esc(o.address)}${o.note?' · নোট: '+esc(o.note):''}</small></div><div style="text-align:right"><span class="pill ${o.status}">${L[o.status]}</span><br><small style="color:var(--mu)">${fdate(o.createdAt)}</small></div></div>${o.items.map(i=>{const p=D.products.find(x=>x.id===i.id);const bad=p&&fp(p)!==i.price;return `<div class="oi"><img src="${esc(i.image||'')}" onerror="this.style.visibility='hidden'"><span style="flex:1">${esc(i.name)} × ${bn(i.qty)}${bad?` <span class="bn">⚠️ বর্তমান দাম ${tk(fp(p))}, অর্ডারে ${tk(i.price)}</span>`:''}</span><b>${tk(i.price*i.qty)}</b></div>`}).join('')}<div style="margin-top:6px;font-size:14px;color:var(--mu)">সাবটোটাল ${tk(o.subtotal)} · ডেলিভারি ${o.delivery?tk(o.delivery):'ফ্রি'}${o.deliveryAreaName?` (${esc(o.deliveryAreaName)})`:''} · <b style="color:var(--tx)">মোট ${tk(o.total)}</b> · ${esc(o.payment||'COD')}${o.commission?' · কমিশন '+tk(o.commission):''}</div><div class="sb">${Object.entries(L).map(([k,v])=>`<button class="${o.status===k?'on':''}" data-s="${o.id}|${k}">${v}</button>`).join('')}</div></div>`).join('')||'<div class="card">কোনো অর্ডার নেই</div>';
  $$('[data-s]').forEach(b=>b.onclick=()=>{const [id,s]=b.dataset.s.split('|');setStatus(D.orders.find(o=>o.id===id),s)});
 }
 
@@ -389,10 +403,10 @@ function vOrd(){
 function vUsr(){
  const draw=()=>{
   const q=($('#us')?.value||'').toLowerCase();
-  $('#ut').innerHTML=D.users.filter(u=>!q||(u.name+u.phone).toLowerCase().includes(q)).map(u=>`<tr><td><b>${esc(u.name)}</b><br><small style="color:var(--mu)">${esc(u.phone)}${u.email?' · '+esc(u.email):''}</small></td><td>💎 ${bn(u.points||0)}</td><td>${tk(u.wallet||0)}</td><td>${tk(u.totalSpent||0)}</td><td>${esc(u.refCode||'')}${u.referredBy?`<br><small style="color:var(--mu)">রেফারার: ${esc(D.users.find(x=>x.id===u.referredBy)?.name||'—')}</small>`:''}</td><td><button class="btn bs" data-e="${u.id}">✏️ এডিট</button></td></tr>`).join('');
-  $$('[data-e]').forEach(b=>b.onclick=()=>{const u=D.users.find(x=>x.id===b.dataset.e);editor('✏️ '+esc(u.name),[{k:'points',l:'পয়েন্ট',t:'num'},{k:'wallet',l:'কমিশন ব্যালেন্স (৳) — পেমেন্ট দেওয়ার পর কমান',t:'num'}],u,async v=>{await updateDoc(doc(db,'users',u.id),v);Object.assign(u,v);draw()})});
+  $('#ut').innerHTML=D.users.filter(u=>!q||(u.name+u.phone).toLowerCase().includes(q)).map(u=>`<tr><td><b>${esc(u.name)}</b><br><small style="color:var(--mu)">${esc(u.phone)}${u.email?' · '+esc(u.email):''}</small></td><td>${tk(u.wallet||0)}</td><td>${tk(u.totalSpent||0)}</td><td>${esc(u.refCode||'')}${u.referredBy?`<br><small style="color:var(--mu)">রেফারার: ${esc(D.users.find(x=>x.id===u.referredBy)?.name||'—')}</small>`:''}</td><td><button class="btn bs" data-e="${u.id}">✏️ এডিট</button></td></tr>`).join('');
+  $$('[data-e]').forEach(b=>b.onclick=()=>{const u=D.users.find(x=>x.id===b.dataset.e);editor('✏️ '+esc(u.name),[{k:'wallet',l:'কমিশন ব্যালেন্স (৳) — পেমেন্ট দেওয়ার পর কমান',t:'num'}],u,async v=>{await updateDoc(doc(db,'users',u.id),v);Object.assign(u,v);draw()})});
  };
- $('#content').innerHTML=`<div class="card"><div class="tb"><input id="us" placeholder="🔍 নাম/নম্বর"></div><div class="tw"><table><tr><th>কাস্টমার</th><th>পয়েন্ট</th><th>কমিশন</th><th>মোট কেনা</th><th>রেফার কোড</th><th></th></tr><tbody id="ut"></tbody></table></div></div>`;
+ $('#content').innerHTML=`<div class="card"><div class="tb"><input id="us" placeholder="🔍 নাম/নম্বর"></div><div class="tw"><table><tr><th>কাস্টমার</th><th>কমিশন</th><th>মোট কেনা</th><th>রেফার কোড</th><th></th></tr><tbody id="ut"></tbody></table></div></div>`;
  $('#us').oninput=draw;draw();
 }
 
@@ -424,10 +438,9 @@ function vSet(){
   {k:'trustItems',l:'আস্থার সারির লেখা — প্রতি লাইনে একটি: ইমোজি|শিরোনাম|ছোট লেখা',t:'ta',rows:5,w:1},
   {k:'flashTitle',l:'ফ্ল্যাশ সেলের শিরোনাম'},
   {k:'flashEndsAt',l:'ফ্ল্যাশ সেল শেষ হবে — তারিখ ও সময় দিলে কাউন্টডাউন চালু হয়, ফাঁকা রাখলে সাধারণ "ছাড়ের প্রডাক্ট" দেখায়',t:'dt'},
-  {k:'freeDeliveryMin',l:'ফ্রি ডেলিভারি (৳ এর বেশি কেনাকাটায়)',t:'num'},{k:'deliveryFee',l:'ডেলিভারি চার্জ (৳)',t:'num'},
-  {k:'pointsPerSpend',l:'কতো টাকা কেনাকাটায় পয়েন্ট (৳)',t:'num'},{k:'pointsEarn',l:'ততো টাকায় কতো পয়েন্ট',t:'num'},{k:'pointValue',l:'১ পয়েন্ট = কতো টাকা',t:'num'}
+  {k:'freeDeliveryMin',l:'ফ্রি ডেলিভারি (৳ এর বেশি কেনাকাটায়) — ০ দিলে ফ্রি ডেলিভারি বন্ধ',t:'num'},{k:'deliveryDhaka',l:'ডেলিভারি চার্জ — ঢাকার ভিতরে (৳)',t:'num'},{k:'deliveryOutside',l:'ডেলিভারি চার্জ — ঢাকার বাইরে (৳)',t:'num'}
  ];
- $('#content').innerHTML=`<div class="card"><div class="note">সাইন আপ বোনাস ১০ পয়েন্ট — এটি firestore.rules ফাইলেও ঠিক করা আছে, বদলাতে চাইলে দুই জায়গাতেই বদলান।</div><form id="sf"><div class="fg">${fs.map(f=>fld(f,D.settings[f.k])).join('')}</div><button class="btn bp">💾 সেটিংস সেভ করুন</button></form></div>`;
+ $('#content').innerHTML=`<div class="card"><div class="note">ডেলিভারি চার্জ বদলালে সাইটে সাথে সাথে নতুন চার্জ দেখাবে। অ্যানাউন্সমেন্ট বারে পুরোনো পয়েন্টের লেখা থাকলে সেটা এখান থেকে বদলে দিন।</div><form id="sf"><div class="fg">${fs.map(f=>fld(f,D.settings[f.k])).join('')}</div><button class="btn bp">💾 সেটিংস সেভ করুন</button></form></div>`;
  $('#sf').onsubmit=async e=>{e.preventDefault();const v=rd(e.target,fs);await setDoc(doc(db,'settings','main'),v,{merge:true});Object.assign(D.settings,v);$('#bname').textContent=v.siteName+' Admin';toast('✅ সেভ হয়েছে')};
 }
 </script>
