@@ -163,7 +163,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2400)};
 /* ভিডিও আপলোডের জন্য Cloudinary (ফাঁকা থাকলে আপলোড বাটন দেখাবে না, শুধু লিংক বসানো যাবে) */
 const CLD={cloud:'',preset:''};
-const DEF={siteName:'আমার শপ',tagline:'সেরা পণ্য, সেরা দামে, দ্রুত ডেলিভারি।',announceText:'🚚 ৳৩,০০০+ কেনাকাটায় ডেলিভারি ফ্রি · ক্যাশ অন ডেলিভারি',announceLink:'#/signup',freeDeliveryMin:3000,deliveryFee:80,deliveryDhaka:80,deliveryOutside:140,pointsPerSpend:2000,pointsEarn:100,pointValue:1,whatsapp:'',phone:'',address:'',logo:'',favicon:'',facebook:'',youtube:'',instagram:'',tiktok:'',payMethods:'cod',showTrust:true,trustItems:'🌿|১০০% খাঁটি|সরাসরি উৎস থেকে সংগ্রহ\n💵|ক্যাশ অন ডেলিভারি|পণ্য হাতে পেয়ে টাকা দিন\n↩️|৭ দিনে ফেরত|সমস্যা হলে সহজ ফেরত\n🚚|দ্রুত ডেলিভারি|সারা দেশে দ্রুত পৌঁছে দিই',flashTitle:'⚡ ফ্ল্যাশ সেল',flashEndsAt:0,categories:[{id:'organic',name:'অর্গানিক',icon:'🌿'},{id:'electronics',name:'ইলেক্ট্রনিক',icon:'🔌'}]};
+const DEF={siteName:'আমার শপ',tagline:'সেরা পণ্য, সেরা দামে, দ্রুত ডেলিভারি।',announceText:'🚚 ৳৩,০০০+ কেনাকাটায় ডেলিভারি ফ্রি · ক্যাশ অন ডেলিভারি',announceLink:'#/signup',freeDeliveryMin:2000,deliveryFee:80,deliveryDhaka:80,deliveryOutside:140,pointsPerSpend:2000,pointsEarn:100,pointValue:1,whatsapp:'',phone:'',address:'',logo:'',favicon:'',facebook:'',youtube:'',instagram:'',tiktok:'',payMethods:'cod',showTrust:true,trustItems:'🌿|১০০% খাঁটি|সরাসরি উৎস থেকে সংগ্রহ\n💵|ক্যাশ অন ডেলিভারি|পণ্য হাতে পেয়ে টাকা দিন\n↩️|৭ দিনে ফেরত|সমস্যা হলে সহজ ফেরত\n🚚|দ্রুত ডেলিভারি|সারা দেশে দ্রুত পৌঁছে দিই',flashTitle:'⚡ ফ্ল্যাশ সেল',flashEndsAt:0,categories:[{id:'organic',name:'অর্গানিক',icon:'🌿'},{id:'electronics',name:'ইলেক্ট্রনিক',icon:'🔌'}]};
 const D={settings:{...DEF},products:[],banners:[],orders:[],users:[],chats:[]};
 let tab='dash',unsubs=[],chatUn=null,curChat=null;
 const TABS=[['dash','📊','ড্যাশবোর্ড'],['prod','📦','প্রডাক্ট'],['cat','🗂️','ক্যাটাগরি'],['hero','🖼️','হিরো ব্যানার'],['promo','🏷️','ডিসকাউন্ট ব্যানার'],['strip','📢','স্ট্রিপ ব্যানার'],['ord','🧾','অর্ডার'],['usr','👥','কাস্টমার'],['chat','💬','লাইভ চ্যাট'],['set','⚙️','সেটিংস']];
@@ -276,7 +276,8 @@ const PF=()=>[
  {k:'commissionValue',l:'কমিশন পরিমাণ',t:'num',def:0},
  {k:'images',l:'ইমেজ লিংক (৩/৪টি)',t:'imgs'},
  {k:'videoUrl',l:'ভিডিও লিংক (YouTube/Shorts অথবা MP4) — প্রডাক্ট পেজের প্রথম স্লটে নিজে চলবে। ফাঁকা রাখলে ভিডিও থাকবে না',t:'vid',w:1},
- {k:'desc',l:'বিবরণ',t:'ta',rows:5,w:1},
+ {k:'descTitle',l:'ডিসক্রিপশনের শিরোনাম — দাগের উপরে বড় অক্ষরে দেখাবে (যেমন: শাহী হালুয়া খেলে হবেন আপনি রাতের রাজা)। ফাঁকা রাখলে দেখাবে না',w:1},
+ {k:'desc',l:'বিবরণ (দাগের নিচে সম্পূর্ণ ডিসক্রিপশন)',t:'ta',rows:5,w:1},
  {k:'featured',l:'ফিচার্ড',t:'chk',def:false},
  {k:'active',l:'সাইটে দেখান',t:'chk',def:true}
 ];
