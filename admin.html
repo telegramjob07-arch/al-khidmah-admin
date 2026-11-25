@@ -127,6 +127,11 @@ main{padding:14px}
 .stats{grid-template-columns:1fr 1fr;gap:12px}.st{padding:16px}.st b{font-size:22px}
 .card{padding:14px;border-radius:16px}
 }
+.sli{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.sli input{flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#faf9ff}
+.sln{width:24px;text-align:center;font-weight:700;color:var(--mu);flex:none}
+.sli .sth{width:80px;height:45px;border-radius:8px;object-fit:cover;flex:none}
+@media(max-width:600px){.sli{flex-wrap:wrap}.sli input{flex:1 1 100%;order:5}}
 </style>
 </head>
 <body>
@@ -166,7 +171,7 @@ const CLD={cloud:'',preset:''};
 const DEF={siteName:'আমার শপ',tagline:'সেরা পণ্য, সেরা দামে, দ্রুত ডেলিভারি।',announceText:'🚚 ৳৩,০০০+ কেনাকাটায় ডেলিভারি ফ্রি · ক্যাশ অন ডেলিভারি',announceLink:'#/signup',freeDeliveryMin:2000,deliveryFee:80,deliveryDhaka:80,deliveryOutside:140,pointsPerSpend:2000,pointsEarn:100,pointValue:1,whatsapp:'',phone:'',address:'',logo:'',favicon:'',facebook:'',youtube:'',instagram:'',tiktok:'',payMethods:'cod',showTrust:true,trustItems:'🌿|১০০% খাঁটি|সরাসরি উৎস থেকে সংগ্রহ\n💵|ক্যাশ অন ডেলিভারি|পণ্য হাতে পেয়ে টাকা দিন\n↩️|৭ দিনে ফেরত|সমস্যা হলে সহজ ফেরত\n🚚|দ্রুত ডেলিভারি|সারা দেশে দ্রুত পৌঁছে দিই',flashTitle:'⚡ ফ্ল্যাশ সেল',flashEndsAt:0,categories:[{id:'organic',name:'অর্গানিক',icon:'🌿'},{id:'electronics',name:'ইলেক্ট্রনিক',icon:'🔌'}]};
 const D={settings:{...DEF},products:[],banners:[],orders:[],users:[],chats:[]};
 let tab='dash',unsubs=[],chatUn=null,curChat=null;
-const TABS=[['dash','📊','ড্যাশবোর্ড'],['prod','📦','প্রডাক্ট'],['cat','🗂️','ক্যাটাগরি'],['hero','🖼️','হিরো ব্যানার'],['promo','🏷️','ডিসকাউন্ট ব্যানার'],['strip','📢','স্ট্রিপ ব্যানার'],['ord','🧾','অর্ডার'],['usr','👥','কাস্টমার'],['chat','💬','লাইভ চ্যাট'],['set','⚙️','সেটিংস']];
+const TABS=[['dash','📊','ড্যাশবোর্ড'],['prod','📦','প্রডাক্ট'],['cat','🗂️','ক্যাটাগরি'],['hero','🖼️','হিরো ব্যানার'],['slider','🌄','হিরো স্লাইডার'],['promo','🏷️','ডিসকাউন্ট ব্যানার'],['strip','📢','স্ট্রিপ ব্যানার'],['ord','🧾','অর্ডার'],['usr','👥','কাস্টমার'],['chat','💬','লাইভ চ্যাট'],['set','⚙️','সেটিংস']];
 const L={pending:'অপেক্ষমাণ',confirmed:'কনফার্মড',shipped:'শিপড',delivered:'ডেলিভারড',cancelled:'বাতিল'};
 const fp=p=>{let v=+p.price||0;if(+p.discount>0)v=v*(1-p.discount/100);if(+p.flatDiscount>0)v-=+p.flatDiscount;return Math.max(0,Math.round(v))};
 const ms=t=>t?.seconds?t.seconds*1000:0;
@@ -208,7 +213,7 @@ function paintMenu(){
 }
 function render(){
  const T=TABS.find(t=>t[0]===tab);$('#ttl').textContent=T[1]+' '+T[2];$('#mtt').textContent=T[1]+' '+T[2];window.scrollTo(0,0);$('#sub').textContent='';$('#act').innerHTML='';
- ({dash:vDash,prod:vProd,cat:vCat,hero:()=>vBanner('hero'),promo:()=>vBanner('promo'),strip:()=>vBanner('strip'),ord:vOrd,usr:vUsr,chat:vChat,set:vSet}[tab])();
+ ({dash:vDash,prod:vProd,cat:vCat,hero:()=>vBanner('hero'),slider:vSlider,promo:()=>vBanner('promo'),strip:()=>vBanner('strip'),ord:vOrd,usr:vUsr,chat:vChat,set:vSet}[tab])();
 }
 
 /* ---------- modal form helper ---------- */
@@ -369,6 +374,34 @@ function vBanner(type){
   },type==='strip'?stripPV:null);
  };
  $('#nb').onclick=()=>edit(null);draw();
+}
+
+/* ---------- hero image slider ---------- */
+function vSlider(){
+ const cur=D.banners.find(b=>b.type==='slider');
+ let imgs=[...((cur&&cur.images)||[])];
+ const draw=()=>{
+  $('#content').innerHTML=`<div class="card"><div class="note">এখানে ছবির লিংক বসান। যতগুলো লিংক রেখে সেভ করবেন, সাইটের হোম পেজে ঠিক ততগুলো ছবিই স্লাইডারে ঘুরবে। ছবি ১৬:৯ মাপের (যেমন ১২৮০×৭২০) হলে সবচেয়ে সুন্দর দেখাবে, নইলে ছবি না কেটে পুরোটাই দেখানো হবে। কোনো ছবির লিংক না থাকলে সাইটে পুরোনো হিরো ব্যানার দেখাবে।</div>
+  ${imgs.map((u,i)=>`<div class="sli"><span class="sln">${bn(i+1)}</span><img class="th sth" src="${esc(u)}" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'"><input data-i="${i}" value="${esc(u)}" placeholder="ছবির লিংক (https://...)"><button type="button" class="btn bs" data-mv="${i}|-1" title="উপরে">↑</button><button type="button" class="btn bs" data-mv="${i}|1" title="নিচে">↓</button><button type="button" class="btn bs bd" data-x="${i}" title="মুছুন">🗑️</button></div>`).join('')||'<div class="empty-s" style="color:var(--mu);padding:14px 0">এখনো কোনো ছবি নেই। নিচের বাটনে চাপ দিয়ে ছবি যোগ করুন।</div>'}
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button type="button" class="btn" id="sa">➕ নতুন ছবি যোগ করুন</button><button type="button" class="btn bp" id="ss">💾 সেভ করুন</button></div></div>`;
+  $$('.sli input').forEach(inp=>{inp.onchange=()=>{imgs[+inp.dataset.i]=inp.value.trim();const t=inp.parentElement.querySelector('.sth');if(t)t.src=inp.value.trim()}});
+  $$('[data-x]').forEach(b=>b.onclick=()=>{sync();imgs.splice(+b.dataset.x,1);draw()});
+  $$('[data-mv]').forEach(b=>b.onclick=()=>{sync();const [i,d]=b.dataset.mv.split('|').map(Number),j=i+d;if(j<0||j>=imgs.length)return;[imgs[i],imgs[j]]=[imgs[j],imgs[i]];draw()});
+  $('#sa').onclick=()=>{sync();imgs.push('');draw();const l=$$('.sli input');if(l.length)l[l.length-1].focus()};
+  $('#ss').onclick=async()=>{
+   sync();const clean=imgs.map(u=>String(u||'').trim()).filter(Boolean);
+   if(clean.some(u=>!/^https?:\/\//i.test(u)))return toast('❌ সব লিংক http:// বা https:// দিয়ে শুরু হতে হবে');
+   const b=$('#ss');b.disabled=true;
+   try{
+    const id=cur?cur.id:'hero-slider',data={type:'slider',images:clean,active:true,updatedAt:serverTimestamp()};
+    await setDoc(doc(db,'banners',id),data);
+    if(cur){cur.images=clean;cur.active=true}else{const n={id,type:'slider',images:clean,active:true};D.banners.push(n)}
+    imgs=clean;draw();toast('✅ সেভ হয়েছে — হোম পেজে '+bn(clean.length)+'টি ছবি দেখাবে');
+   }catch(x){console.error(x);toast('❌ সেভ হয়নি: '+(x.code||x.message));b.disabled=false}
+  };
+ };
+ const sync=()=>{$$('.sli input').forEach(inp=>{imgs[+inp.dataset.i]=inp.value.trim()})};
+ draw();
 }
 
 /* ---------- orders + status logic ---------- */
